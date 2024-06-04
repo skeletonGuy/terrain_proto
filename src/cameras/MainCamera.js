@@ -1,0 +1,15 @@
+import * as THREE from "three";
+
+export const MainCamera = () => {
+  const fov = 40;
+  const aspect = 2;
+  const near = 1;
+  const far = 10000;
+
+  const mainCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  mainCamera.position.set(0, 10, 20);
+
+  return mainCamera;
+};
+
+export default MainCamera;
