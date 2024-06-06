@@ -2,10 +2,6 @@ import * as THREE from "three";
 
 export class Sun {
   constructor({ elevation, azimuth }) {
-    //this._properties = {
-    //  elevation: elevation ?? 2,
-    //  azimuth: azimuth ?? 180,
-    //};
     this._elevation = elevation ?? 2;
     this._azimuth = azimuth ?? 180;
     this._position = new THREE.Vector3();
