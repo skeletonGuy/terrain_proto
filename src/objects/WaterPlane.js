@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Water } from "three/addons/objects/Water.js";
 
 export class WaterPlane {
-  constructor({ scene, gui }) {
+  constructor({ scene }) {
     this.scene = scene;
     this.geometry = new THREE.PlaneGeometry(5000, 5000);
     this.sunVector = new THREE.Vector3();
@@ -16,7 +16,7 @@ export class WaterPlane {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         }
       ),
-      sunDirection: sunVector,
+      sunDirection: this.sunVector,
       sunColor: 0xffffff,
       waterColor: 0x001e0f,
       distortionScale: 3.7,
@@ -28,24 +28,10 @@ export class WaterPlane {
     this.mesh.position.y = 600;
 
     this.scene.add(this.mesh);
-
-    this.initDevGUI(gui);
   }
 
   destroy() {
     this.scene.remove(this.mesh);
-  }
-
-  initDevGUI(gui) {
-    const folderWater = gui.addFolder("Water");
-    const waterUniforms = this.mesh.material.uniforms;
-
-    folderWater
-      .add(waterUniforms.distortionScale, "value", 0, 8, 0.1)
-      .name("distortion scale");
-    folderWater.add(waterUniforms.size, "value", 0.1, 10, 0.1).name("size");
-    folderWater.add(this.mesh.position, "y").name("Water Elevation");
-    folderWater.open();
   }
 
   getMesh() {

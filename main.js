@@ -3,29 +3,32 @@ import * as THREE from "three";
 /** Objects */
 import MappedTerrain from "./src/objects/MappedTerrain";
 import { WaterPlane } from "./src/objects/WaterPlane";
+import { SkyBox } from "./src/objects/SkyBox";
+import { Sun } from "./src/objects/Sun";
 
 /** Camera */
 import MainCamera from "./src/cameras/MainCamera";
 
-/** Lights */
-import DirectionalLight from "./src/lights/DirectionalLight";
-
 /** UTILS */
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Sky } from "three/addons/objects/Sky.js";
 import resizeRendererToDisplaySize from "./src/utils/resizeRendererToDisplaySize";
 import Stats from "three/addons/libs/stats.module.js";
+import { updateSunPosition } from "./src/utils/updateSunPosition";
+import { initSunUI, initWaterUI } from "./devUtils/uis/initUI";
 
 const scene = new THREE.Scene();
+const sceneEnv = new THREE.Scene();
 const gui = new GUI();
 const canvas = document.getElementById("main_canvas");
 const container = document.getElementById("container");
+
 /** RENDERER */
 const renderer = new THREE.WebGLRenderer({ canvas });
-//renderer.setPixelRatio(window.devicePixelRatio);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.5;
+
+const pmremGenerator = new THREE.PMREMGenerator(renderer);
 
 const camera = MainCamera();
 const controls = new OrbitControls(camera, canvas);
@@ -34,29 +37,7 @@ const controls = new OrbitControls(camera, canvas);
 const stats = new Stats();
 container.appendChild(stats.dom);
 
-let sun = new THREE.Vector3();
-const waterObj = new WaterPlane({
-  sunVector: sun,
-  scene,
-  gui,
-});
-const water = waterObj.getMesh();
-
-const sky = new Sky();
-sky.scale.setScalar(10000);
-const skyUniforms = sky.material.uniforms;
-
-skyUniforms["turbidity"].value = 10;
-skyUniforms["rayleigh"].value = 2;
-skyUniforms["mieCoefficient"].value = 0.005;
-skyUniforms["mieDirectionalG"].value = 0.8;
-
-scene.add(water, sky);
-
-const skyParameters = {
-  elevation: 2,
-  azimuth: 180,
-};
+/** OBJECTS */
 const heightMap = new THREE.TextureLoader().load(
   "textures/terrain_depth_map.png",
   function (texture) {
@@ -69,37 +50,35 @@ const heightMap = new THREE.TextureLoader().load(
     scene.add(terrain.getTerrain());
   }
 );
+const sun = new Sun({ gui });
+const waterObj = new WaterPlane({
+  sunVector: sun,
+  scene,
+  gui,
+});
+const water = waterObj.getMesh();
+const sky = new SkyBox({ scene, gui, sceneEnv });
 
-const pmremGenerator = new THREE.PMREMGenerator(renderer);
-const sceneEnv = new THREE.Scene();
+updateSunPosition({
+  Sun: sun,
+  WaterPlane: waterObj,
+  Sky: sky,
+  sceneEnv,
+  scene,
+  pmremGenerator,
+});
 
-let renderTarget;
+initSunUI({
+  gui,
+  Sun: sun,
+  Sky: sky,
+  WaterPlane: waterObj,
+  sceneEnv,
+  scene,
+  pmremGenerator,
+});
 
-//** GUI */
-const folderSky = gui.addFolder("Sky");
-folderSky.add(skyParameters, "elevation", 0, 90, 0.1).onChange(updateSun);
-folderSky.add(skyParameters, "azimuth", -180, 180, 0.1).onChange(updateSun);
-folderSky.open();
-
-function updateSun() {
-  const phi = THREE.MathUtils.degToRad(90 - skyParameters.elevation);
-  const theta = THREE.MathUtils.degToRad(skyParameters.azimuth);
-
-  sun.setFromSphericalCoords(1, phi, theta);
-
-  sky.material.uniforms["sunPosition"].value.copy(sun);
-  water.material.uniforms["sunDirection"].value.copy(sun).normalize();
-
-  if (renderTarget !== undefined) renderTarget.dispose();
-
-  sceneEnv.add(sky);
-  renderTarget = pmremGenerator.fromScene(sceneEnv);
-  scene.add(sky);
-
-  scene.environment = renderTarget.texture;
-}
-
-updateSun();
+initWaterUI(gui, waterObj);
 
 function render() {
   const time = performance.now() * 0.001;

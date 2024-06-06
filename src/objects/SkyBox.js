@@ -1,7 +1,9 @@
+import { Sky } from "three/addons/objects/Sky.js";
+
 export class SkyBox {
   constructor({ scene, gui, sceneEnv }) {
     const sky = new Sky();
-    sky.setScalar(10000);
+    sky.scale.setScalar(10000);
 
     const skyUniforms = sky.material.uniforms;
 
@@ -14,6 +16,10 @@ export class SkyBox {
     this.scene = scene;
     this.sceneEnv = sceneEnv;
     this.scene.add(this.mesh);
+  }
+
+  getMesh() {
+    return this.mesh;
   }
 
   updateSunPosition(vector3) {
