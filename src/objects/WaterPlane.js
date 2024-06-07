@@ -1,22 +1,26 @@
 import * as THREE from "three";
 import { Water } from "three/addons/objects/Water.js";
+import { Object } from "./Object";
 
-export class WaterPlane {
-  constructor({ scene }) {
+export class WaterPlane extends Object {
+  constructor({ name, scene }) {
+    super({ name });
+    // TODO: scene objects should be stored in the parent GameScene object
+    // Object class items should not interact with scene directly
     this.scene = scene;
-    this.geometry = new THREE.PlaneGeometry(5000, 5000);
-    this.sunVector = new THREE.Vector3();
+    this._geometry = new THREE.PlaneGeometry(5000, 5000);
+    this._sunVector = new THREE.Vector3();
 
-    this.mesh = new Water(this.geometry, {
+    this._mesh = new Water(this._geometry, {
       textureWidth: 2048,
       textureHeight: 2048,
       waterNormals: new THREE.TextureLoader().load(
         "textures/waternormals.jpg",
         function (texture) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-        }
+        },
       ),
-      sunDirection: this.sunVector,
+      sunDirection: this._sunVector,
       sunColor: 0xffffff,
       waterColor: 0x001e0f,
       distortionScale: 3.7,
@@ -24,24 +28,24 @@ export class WaterPlane {
       side: THREE.DoubleSide,
     });
 
-    this.mesh.rotation.x = -Math.PI / 2;
-    this.mesh.position.y = 600;
+    this._mesh.rotation.x = -Math.PI / 2;
+    this._mesh.position.y = 600;
 
-    this.scene.add(this.mesh);
+    this.scene.add(this._mesh);
   }
 
   destroy() {
-    this.scene.remove(this.mesh);
+    this.scene.remove(this._mesh);
   }
 
   getMesh() {
-    return this.mesh;
+    return this._mesh;
   }
 
   updateSunDirection(vector3) {
-    this.sunVector = vector3;
-    this.mesh.material.uniforms["sunDirection"].value
-      .copy(this.sunVector)
+    this._sunVector = vector3;
+    this._mesh.material.uniforms["sunDirection"].value
+      .copy(this._sunVector)
       .normalize();
   }
 }

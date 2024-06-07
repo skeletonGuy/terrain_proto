@@ -1,7 +1,9 @@
 import { Sky } from "three/addons/objects/Sky.js";
+import { Object } from "./Object";
 
-export class SkyBox {
-  constructor({ scene, gui, sceneEnv }) {
+export class SkyBox extends Object {
+  constructor({ name, scene, gui, sceneEnv }) {
+    super({ name });
     const sky = new Sky();
     sky.scale.setScalar(10000);
 
@@ -12,19 +14,15 @@ export class SkyBox {
     skyUniforms["mieCoefficient"].value = 0.005;
     skyUniforms["mieDirectionalG"].value = 0.8;
 
-    this.mesh = sky;
-    this.scene = scene;
-    this.sceneEnv = sceneEnv;
-    this.scene.add(this.mesh);
+    this._mesh = sky;
+    // TODO: scene objects should be stored in the parent GameScene object
+    // Object class items should not interact with scene directly
+    this._scene = scene;
+    this._sceneEnv = sceneEnv;
+    this._scene.add(this.mesh);
   }
 
   getMesh() {
-    return this.mesh;
-  }
-
-  updateSunPosition(vector3) {
-    this.mesh.material.uniforms["sunPosition"].value.copy(vector3);
-    sceneEnv.add(this.mesh);
-    this.scene.add(this.mesh);
+    return this._mesh;
   }
 }
