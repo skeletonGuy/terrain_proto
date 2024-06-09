@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { Water } from 'three/addons/objects/Water.js';
-import { Object } from './Object';
+import Object from './Object';
 
-export class WaterPlane extends Object {
+class WaterPlane extends Object {
   constructor({ name }) {
     super({ name });
     // TODO: scene objects should be stored in the parent GameScene object
@@ -34,3 +34,5 @@ export class WaterPlane extends Object {
     return this._mesh;
   }
 }
+
+export default WaterPlane;

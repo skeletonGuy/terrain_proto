@@ -1,4 +1,4 @@
-export class Object {
+class Object {
   constructor({ name }) {
     this._name = name;
     this._subObjects = [];
@@ -30,3 +30,5 @@ export class Object {
     return this._name;
   }
 }
+
+export default Object;

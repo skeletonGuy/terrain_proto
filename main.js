@@ -1,13 +1,13 @@
 import * as THREE from 'three';
 
 /** scenes */
-import { GameScene } from './src/scenes/GameScene';
+import GameScene from './src/scenes/GameScene';
 import GameSceneBehavior from './src/scenes/GameSceneBehavior';
 
 /** Objects */
 import MappedTerrain from './src/objects/MappedTerrain';
-import { WaterPlane } from './src/objects/WaterPlane';
-import { SkyBox } from './src/objects/SkyBox';
+import WaterPlane from './src/objects/WaterPlane';
+import SkyBox from './src/objects/SkyBox';
 
 /** Camera */
 import MainCamera from './src/cameras/MainCamera';

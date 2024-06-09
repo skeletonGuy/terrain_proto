@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Object } from './Object';
+import Object from './Object';
 
 class MappedTerrain extends Object {
   constructor({ name, heightMapPath, width, depth, segments = 65 } = {}) {

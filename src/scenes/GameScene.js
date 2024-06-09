@@ -3,7 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import resizeRendererToDisplaySize from '../utils/resizeRendererToDisplaySize';
 import Stats from 'three/addons/libs/stats.module.js';
 
-export class GameScene {
+class GameScene {
   constructor(renderer, { enableStats } = {}) {
     this._scene = new THREE.Scene();
     this._sceneEnvironment;
@@ -122,3 +122,5 @@ export class GameScene {
     document.body.appendChild(this._stats.dom);
   }
 }
+
+export default GameScene;

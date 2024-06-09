@@ -1,7 +1,7 @@
 import { Sky } from 'three/addons/objects/Sky.js';
-import { Object } from './Object';
+import Object from './Object';
 
-export class SkyBox extends Object {
+class SkyBox extends Object {
   constructor({ name }) {
     super({ name });
     const sky = new Sky();
@@ -17,3 +17,5 @@ export class SkyBox extends Object {
     this._mesh = sky;
   }
 }
+
+export default SkyBox;
