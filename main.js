@@ -1,99 +1,85 @@
 import * as THREE from "three";
 
+/** scenes */
+import { GameScene } from "./src/scenes/GameScene";
+import GameSceneBehavior from "./src/scenes/GameSceneBehavior";
+
 /** Objects */
 import MappedTerrain from "./src/objects/MappedTerrain";
 import { WaterPlane } from "./src/objects/WaterPlane";
 import { SkyBox } from "./src/objects/SkyBox";
-import { Sun } from "./src/objects/Sun";
 
 /** Camera */
 import MainCamera from "./src/cameras/MainCamera";
 
 /** UTILS */
-import { GUI } from "three/addons/libs/lil-gui.module.min.js";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import resizeRendererToDisplaySize from "./src/utils/resizeRendererToDisplaySize";
 import Stats from "three/addons/libs/stats.module.js";
-import { updateSunPosition } from "./src/utils/updateSunPosition";
 import { initSunUI, initWaterUI } from "./devUtils/uis/initUI";
 
-const scene = new THREE.Scene();
-const sceneEnv = new THREE.Scene();
-const gui = new GUI();
-const canvas = document.getElementById("main_canvas");
-const container = document.getElementById("container");
+function main() {
+  const canvas = document.getElementById("main_canvas");
+  const container = document.getElementById("container");
 
-/** RENDERER */
-const renderer = new THREE.WebGLRenderer({ canvas });
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.5;
+  /** RENDERER */
+  const renderer = new THREE.WebGLRenderer({ canvas });
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.5;
 
-const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  const scene = new GameScene(renderer);
+  scene.addCamera(MainCamera());
+  scene.initOrbitControls();
 
-const camera = MainCamera();
-const controls = new OrbitControls(camera, canvas);
+  /**  STATS */
+  const stats = new Stats();
+  container.appendChild(stats.dom);
 
-/**  STATS */
-const stats = new Stats();
-container.appendChild(stats.dom);
-
-/** OBJECTS */
-const heightMap = new THREE.TextureLoader().load(
-  "textures/terrain_depth_map.png",
-  function (texture) {
-    const terrain = new MappedTerrain({
-      mapTexture: texture,
+  /** OBJECTS */
+  scene.addObject(
+    new MappedTerrain({
+      name: "terrain",
+      heightMapPath: "textures/terrain_depth_map.png",
       width: 5000,
       depth: 5000,
       segments: 65,
-    });
-    scene.add(terrain.getTerrain());
-  }
-);
-const sun = new Sun({ gui });
-const waterObj = new WaterPlane({
-  sunVector: sun,
-  scene,
-  gui,
-});
-const water = waterObj.getMesh();
-const sky = new SkyBox({ scene, gui, sceneEnv });
+    }),
+  );
+  scene.addObject(new WaterPlane({ name: "water" }));
+  scene.addObject(new SkyBox({ name: "sky" }));
+  scene.setEnvironmentGenerator(new THREE.PMREMGenerator(renderer));
 
-updateSunPosition({
-  Sun: sun,
-  WaterPlane: waterObj,
-  Sky: sky,
-  sceneEnv,
-  scene,
-  pmremGenerator,
-});
+  const sunBehavior = new GameSceneBehavior({
+    gameScene: scene,
+    runOnInit: true,
+    parameters: {
+      azimuth: 180,
+      elevation: 2,
+    },
+    onChange: (scene, parameters) => {
+      const { elevation, azimuth } = parameters;
+      const sky = scene.getObject("sky");
+      const water = scene.getObject("water");
+      const phi = THREE.MathUtils.degToRad(90 - elevation);
+      const theta = THREE.MathUtils.degToRad(azimuth);
+      const position = new THREE.Vector3().setFromSphericalCoords(
+        1,
+        phi,
+        theta,
+      );
 
-initSunUI({
-  gui,
-  Sun: sun,
-  Sky: sky,
-  WaterPlane: waterObj,
-  sceneEnv,
-  scene,
-  pmremGenerator,
-});
+      sky.mesh.material.uniforms["sunPosition"].value.copy(position);
+      water.mesh.material.uniforms["sunDirection"].value
+        .copy(position)
+        .normalize();
+      scene.setEnvironment([sky]);
+    },
+  });
 
-initWaterUI(gui, waterObj);
+  scene.enableStats();
 
-function render() {
-  const time = performance.now() * 0.001;
-  stats.update();
-  water.material.uniforms["time"].value += 0.5 / 60.0;
+  scene.start();
 
-  if (resizeRendererToDisplaySize(renderer)) {
-    const canvas = renderer.domElement;
-    camera.aspect = canvas.clientWidth / canvas.clientHeight;
-    camera.updateProjectionMatrix();
-  }
-
-  renderer.render(scene, camera);
-
-  requestAnimationFrame(render);
+  initSunUI(sunBehavior);
+  initWaterUI(scene.getObject("water"));
 }
 
-requestAnimationFrame(render);
+main();

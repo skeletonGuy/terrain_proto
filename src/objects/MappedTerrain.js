@@ -1,11 +1,35 @@
 import * as THREE from "three";
+import { Object } from "./Object";
 
-class MappedTerrain {
-  constructor({ mapTexture, width, depth, segments = 65 } = {}) {
-    this.geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
-    this.vertices = this.geometry.attributes.position.array;
+class MappedTerrain extends Object {
+  constructor({ name, heightMapPath, width, depth, segments = 65 } = {}) {
+    super(name);
+    const texture = new THREE.TextureLoader().load(
+      "/textures/aerial_ground_rock.jpg",
+    );
+    this._geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
+    //this._vertices = this._geometry.attributes.position.array;
+    this._material = new THREE.MeshStandardMaterial({
+      side: THREE.DoubleSide,
+      roughness: 1,
+      map: texture,
+    });
+    this._mesh = new THREE.Mesh(this._geometry, this._material);
+    this._mesh.rotation.x = -Math.PI / 2;
 
-    const mapData = this.processMapdata(mapTexture);
+    new THREE.TextureLoader().load(heightMapPath, (mapTexture) => {
+      const mapData = this.getMapData(mapTexture);
+      this.updateTerrain(mapData, segments, mapTexture);
+    });
+  }
+
+  updateTerrain(mapData, segments, mapTexture) {
+    console.log("mapData: ", mapData);
+    console.log("segments: ", segments);
+    console.log("MapTextureWidth", mapTexture.image.width);
+    console.log("MapTextureHeight", mapTexture.image.height);
+    const positionAttribute = this._mesh.geometry.attributes.position;
+    const vertices = positionAttribute.array;
 
     for (let i = 0; i <= segments; i++) {
       for (let j = 0; j <= segments; j++) {
@@ -14,26 +38,13 @@ class MappedTerrain {
         const y = Math.floor((j / segments) * (mapTexture.image.height - 1));
         const pixelIndex = (y * mapTexture.image.width + x) * 4;
         const height = mapData[pixelIndex] * 5; // Normalize height to a range, e.g., 0 to 10
-        this.vertices[index + 2] = height;
+        vertices[index + 2] = height;
       }
     }
-    this.geometry.needsUpdate = true;
-
-    const texture = new THREE.TextureLoader().load(
-      "/textures/aerial_ground_rock.jpg"
-    );
-
-    this.material = new THREE.MeshStandardMaterial({
-      side: THREE.DoubleSide,
-      roughness: 1,
-      map: texture,
-    });
-    this.terrain = new THREE.Mesh(this.geometry, this.material);
-
-    this.terrain.rotation.x = -Math.PI / 2;
+    positionAttribute.needsUpdate = true;
   }
 
-  processMapdata(mapTexture) {
+  getMapData(mapTexture) {
     const canvas = document.createElement("canvas");
     const context = canvas.getContext("2d");
     canvas.width = mapTexture.image.width;
@@ -41,12 +52,8 @@ class MappedTerrain {
     context.drawImage(mapTexture.image, 0, 0);
 
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    //canvas.remove();
-    return imageData.data;
-  }
 
-  getTerrain() {
-    return this.terrain;
+    return imageData.data;
   }
 }
 

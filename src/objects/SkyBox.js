@@ -2,7 +2,7 @@ import { Sky } from "three/addons/objects/Sky.js";
 import { Object } from "./Object";
 
 export class SkyBox extends Object {
-  constructor({ name, scene, gui, sceneEnv }) {
+  constructor({ name }) {
     super({ name });
     const sky = new Sky();
     sky.scale.setScalar(10000);
@@ -17,12 +17,5 @@ export class SkyBox extends Object {
     this._mesh = sky;
     // TODO: scene objects should be stored in the parent GameScene object
     // Object class items should not interact with scene directly
-    this._scene = scene;
-    this._sceneEnv = sceneEnv;
-    this._scene.add(this.mesh);
-  }
-
-  getMesh() {
-    return this._mesh;
   }
 }
