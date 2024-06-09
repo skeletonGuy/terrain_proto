@@ -1,6 +1,6 @@
-import * as THREE from "three";
-import { Water } from "three/addons/objects/Water.js";
-import { Object } from "./Object";
+import * as THREE from 'three';
+import { Water } from 'three/addons/objects/Water.js';
+import { Object } from './Object';
 
 export class WaterPlane extends Object {
   constructor({ name }) {
@@ -13,7 +13,7 @@ export class WaterPlane extends Object {
       textureWidth: 2048,
       textureHeight: 2048,
       waterNormals: new THREE.TextureLoader().load(
-        "textures/waternormals.jpg",
+        'textures/waternormals.jpg',
         function (texture) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         },

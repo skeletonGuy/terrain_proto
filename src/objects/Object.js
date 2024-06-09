@@ -11,7 +11,7 @@ export class Object {
     for (obj of this._subObjects) {
       if (obj.name === object.name) {
         throw Error(
-          "Object.addObject: Cannot add an object with the same name as a sub object",
+          'Object.addObject: Cannot add an object with the same name as a sub object',
         );
       }
     }

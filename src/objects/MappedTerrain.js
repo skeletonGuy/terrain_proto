@@ -1,11 +1,11 @@
-import * as THREE from "three";
-import { Object } from "./Object";
+import * as THREE from 'three';
+import { Object } from './Object';
 
 class MappedTerrain extends Object {
   constructor({ name, heightMapPath, width, depth, segments = 65 } = {}) {
     super(name);
     const texture = new THREE.TextureLoader().load(
-      "/textures/aerial_ground_rock.jpg",
+      '/textures/aerial_ground_rock.jpg',
     );
     this._geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
     //this._vertices = this._geometry.attributes.position.array;
@@ -24,10 +24,10 @@ class MappedTerrain extends Object {
   }
 
   updateTerrain(mapData, segments, mapTexture) {
-    console.log("mapData: ", mapData);
-    console.log("segments: ", segments);
-    console.log("MapTextureWidth", mapTexture.image.width);
-    console.log("MapTextureHeight", mapTexture.image.height);
+    console.log('mapData: ', mapData);
+    console.log('segments: ', segments);
+    console.log('MapTextureWidth', mapTexture.image.width);
+    console.log('MapTextureHeight', mapTexture.image.height);
     const positionAttribute = this._mesh.geometry.attributes.position;
     const vertices = positionAttribute.array;
 
@@ -45,8 +45,8 @@ class MappedTerrain extends Object {
   }
 
   getMapData(mapTexture) {
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
     canvas.width = mapTexture.image.width;
     canvas.height = mapTexture.image.height;
     context.drawImage(mapTexture.image, 0, 0);

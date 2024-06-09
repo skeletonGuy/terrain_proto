@@ -1,50 +1,44 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 /** scenes */
-import { GameScene } from "./src/scenes/GameScene";
-import GameSceneBehavior from "./src/scenes/GameSceneBehavior";
+import { GameScene } from './src/scenes/GameScene';
+import GameSceneBehavior from './src/scenes/GameSceneBehavior';
 
 /** Objects */
-import MappedTerrain from "./src/objects/MappedTerrain";
-import { WaterPlane } from "./src/objects/WaterPlane";
-import { SkyBox } from "./src/objects/SkyBox";
+import MappedTerrain from './src/objects/MappedTerrain';
+import { WaterPlane } from './src/objects/WaterPlane';
+import { SkyBox } from './src/objects/SkyBox';
 
 /** Camera */
-import MainCamera from "./src/cameras/MainCamera";
+import MainCamera from './src/cameras/MainCamera';
 
 /** UTILS */
-import Stats from "three/addons/libs/stats.module.js";
-import { initSunUI, initWaterUI } from "./devUtils/uis/initUI";
+import { initSunUI, initWaterUI } from './devUtils/uis/initUI';
 
 function main() {
-  const canvas = document.getElementById("main_canvas");
-  const container = document.getElementById("container");
+  const canvas = document.getElementById('main_canvas');
 
   /** RENDERER */
   const renderer = new THREE.WebGLRenderer({ canvas });
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.5;
 
-  const scene = new GameScene(renderer);
+  const scene = new GameScene(renderer, { enableStats: true });
   scene.addCamera(MainCamera());
   scene.initOrbitControls();
-
-  /**  STATS */
-  const stats = new Stats();
-  container.appendChild(stats.dom);
 
   /** OBJECTS */
   scene.addObject(
     new MappedTerrain({
-      name: "terrain",
-      heightMapPath: "textures/terrain_depth_map.png",
+      name: 'terrain',
+      heightMapPath: 'textures/terrain_depth_map.png',
       width: 5000,
       depth: 5000,
       segments: 65,
     }),
   );
-  scene.addObject(new WaterPlane({ name: "water" }));
-  scene.addObject(new SkyBox({ name: "sky" }));
+  scene.addObject(new WaterPlane({ name: 'water' }));
+  scene.addObject(new SkyBox({ name: 'sky' }));
   scene.setEnvironmentGenerator(new THREE.PMREMGenerator(renderer));
 
   const sunBehavior = new GameSceneBehavior({
@@ -56,8 +50,8 @@ function main() {
     },
     onChange: (scene, parameters) => {
       const { elevation, azimuth } = parameters;
-      const sky = scene.getObject("sky");
-      const water = scene.getObject("water");
+      const sky = scene.getObject('sky');
+      const water = scene.getObject('water');
       const phi = THREE.MathUtils.degToRad(90 - elevation);
       const theta = THREE.MathUtils.degToRad(azimuth);
       const position = new THREE.Vector3().setFromSphericalCoords(
@@ -66,20 +60,18 @@ function main() {
         theta,
       );
 
-      sky.mesh.material.uniforms["sunPosition"].value.copy(position);
-      water.mesh.material.uniforms["sunDirection"].value
+      sky.mesh.material.uniforms['sunPosition'].value.copy(position);
+      water.mesh.material.uniforms['sunDirection'].value
         .copy(position)
         .normalize();
       scene.setEnvironment([sky]);
     },
   });
 
-  scene.enableStats();
-
   scene.start();
 
   initSunUI(sunBehavior);
-  initWaterUI(scene.getObject("water"));
+  initWaterUI(scene.getObject('water'));
 }
 
 main();

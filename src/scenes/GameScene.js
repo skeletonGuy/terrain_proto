@@ -1,10 +1,10 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import resizeRendererToDisplaySize from "../utils/resizeRendererToDisplaySize";
-import Stats from "three/addons/libs/stats.module.js";
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import resizeRendererToDisplaySize from '../utils/resizeRendererToDisplaySize';
+import Stats from 'three/addons/libs/stats.module.js';
 
 export class GameScene {
-  constructor(renderer) {
+  constructor(renderer, { enableStats } = {}) {
     this._scene = new THREE.Scene();
     this._sceneEnvironment;
     this._environmentObjects = [];
@@ -17,6 +17,10 @@ export class GameScene {
     this._lastRenderTime = 0;
     this._orbitControls;
     this._stats;
+
+    if (enableStats) {
+      this.enableStats();
+    }
   }
 
   addCamera(camera) {
@@ -50,7 +54,7 @@ export class GameScene {
   setEnvironment(objects) {
     if (!this._environmentGenerator) {
       throw Error(
-        "GameScene.setEnvironment: A generator must be added to the scene before an environment can be set \n Set one with GameScene.environmentGenerator = <environmentGenerator>",
+        'GameScene.setEnvironment: A generator must be added to the scene before an environment can be set \n Set one with GameScene.environmentGenerator = <environmentGenerator>',
       );
     }
 

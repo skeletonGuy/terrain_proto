@@ -1,5 +1,5 @@
-import { Sky } from "three/addons/objects/Sky.js";
-import { Object } from "./Object";
+import { Sky } from 'three/addons/objects/Sky.js';
+import { Object } from './Object';
 
 export class SkyBox extends Object {
   constructor({ name }) {
@@ -9,13 +9,11 @@ export class SkyBox extends Object {
 
     const skyUniforms = sky.material.uniforms;
 
-    skyUniforms["turbidity"].value = 10;
-    skyUniforms["rayleigh"].value = 2;
-    skyUniforms["mieCoefficient"].value = 0.005;
-    skyUniforms["mieDirectionalG"].value = 0.8;
+    skyUniforms['turbidity'].value = 10;
+    skyUniforms['rayleigh'].value = 2;
+    skyUniforms['mieCoefficient'].value = 0.005;
+    skyUniforms['mieDirectionalG'].value = 0.8;
 
     this._mesh = sky;
-    // TODO: scene objects should be stored in the parent GameScene object
-    // Object class items should not interact with scene directly
   }
 }

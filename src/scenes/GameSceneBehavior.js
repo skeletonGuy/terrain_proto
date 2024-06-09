@@ -14,7 +14,7 @@ class GameSceneBehavior {
   }
 
   set parameters(params) {
-    console.log("sett");
+    console.log('sett');
     this._parameters = params;
 
     console.log(this._parameters);

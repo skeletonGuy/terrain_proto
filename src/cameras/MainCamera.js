@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 
 export const MainCamera = () => {
   const fov = 40;
