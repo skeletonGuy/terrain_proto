@@ -8,7 +8,6 @@ class MappedTerrain extends Object {
       '/textures/aerial_ground_rock.jpg',
     );
     this._geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
-    //this._vertices = this._geometry.attributes.position.array;
     this._material = new THREE.MeshStandardMaterial({
       side: THREE.DoubleSide,
       roughness: 1,
@@ -24,10 +23,6 @@ class MappedTerrain extends Object {
   }
 
   updateTerrain(mapData, segments, mapTexture) {
-    console.log('mapData: ', mapData);
-    console.log('segments: ', segments);
-    console.log('MapTextureWidth', mapTexture.image.width);
-    console.log('MapTextureHeight', mapTexture.image.height);
     const positionAttribute = this._mesh.geometry.attributes.position;
     const vertices = positionAttribute.array;
 

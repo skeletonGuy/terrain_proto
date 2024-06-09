@@ -14,11 +14,7 @@ class GameSceneBehavior {
   }
 
   set parameters(params) {
-    console.log('sett');
     this._parameters = params;
-
-    console.log(this._parameters);
-
     this.onChange(this._gameScene, this._parameters);
   }
 }
