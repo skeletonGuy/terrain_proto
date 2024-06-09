@@ -7,7 +7,7 @@ export const MainCamera = () => {
   const far = 50000;
 
   const mainCamera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  mainCamera.position.set(0, 10, 20);
+  mainCamera.position.set(2000, 3000, 6000);
 
   return mainCamera;
 };
