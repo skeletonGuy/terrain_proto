@@ -12,10 +12,16 @@
       .container {
         width: 100%;
         height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      .native_ui_container {
+        padding: 5px;
+        width: 100%;
       }
       .main_canvas {
         width: 100%;
-        height: 100%;
+        height: 97%;
         display: block;
       }
     </style>
@@ -23,6 +29,15 @@
   <body>
     <div id="container" class="container">
       <canvas id="main_canvas" class="main_canvas"></canvas>
+      <div id="native_ui_container" class="native_ui_container">
+        <label for="image_map_input">upload new image map:</label>
+        <input
+          type="file"
+          id="image_map_input"
+          name="image_map_input"
+          accept="image/png, image/jpeg"
+        />
+      </div>
     </div>
     <script type="module" src="/main.js"></script>
   </body>

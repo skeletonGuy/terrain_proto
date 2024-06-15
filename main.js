@@ -5,6 +5,7 @@ import GameScene from './src/scenes/GameScene';
 import GameSceneBehavior from './src/scenes/GameSceneBehavior';
 
 /** Objects */
+import ObjectAnimationBehavior from './src/objects/ObjectAnimationBehavior';
 import MappedTerrain from './src/objects/MappedTerrain';
 import WaterPlane from './src/objects/WaterPlane';
 import SkyBox from './src/objects/SkyBox';
@@ -14,12 +15,13 @@ import MainCamera from './src/cameras/MainCamera';
 
 /** UTILS */
 import { initSunUI, initWaterUI } from './devUtils/uis/initUI';
+import { initMapFileInput } from './src/utils/initMapFileInput';
 
 function main() {
   const canvas = document.getElementById('main_canvas');
 
   /** RENDERER */
-  const renderer = new THREE.WebGLRenderer({ canvas });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.5;
 
@@ -27,8 +29,10 @@ function main() {
   scene.addCamera(MainCamera());
   scene.initOrbitControls();
 
+  const water = scene.addObject(new WaterPlane({ name: 'water' }));
+
   /** OBJECTS */
-  scene.addObject(
+  const terrain = scene.addObject(
     new MappedTerrain({
       name: 'terrain',
       heightMapPath: 'textures/terrain_depth_map.png',
@@ -37,7 +41,32 @@ function main() {
       segments: 65,
     }),
   );
-  scene.addObject(new WaterPlane({ name: 'water' }));
+
+  water.addAnimationBehavior(function ({ deltaTime, time }) {
+    function easeInOutSine(t) {
+      return -(Math.cos(Math.PI * t) - 1) / 2;
+    }
+    const maxY = 700;
+    const minY = 670;
+
+    // Time in seconds
+    const duration = 10; // Duration of one full up and down cycle (seconds)
+    this.mesh.material.uniforms['time'].value += deltaTime / 1000;
+    const cycleTime = (time / 1000) % duration;
+
+    // Normalize cycleTime to range [0, 1]
+    let t = cycleTime / duration;
+
+    // Apply the easing function
+    const easedT = easeInOutSine(t * 2 > 1 ? 2 - t * 2 : t * 2); // Adjust easing for up and down
+
+    // Calculate the new position using the eased progress
+    const newY = minY + (maxY - minY) * easedT;
+
+    // Update the water's position
+    this.mesh.position.y = newY;
+  });
+
   scene.addObject(new SkyBox({ name: 'sky' }));
   scene.setEnvironmentGenerator(new THREE.PMREMGenerator(renderer));
 
@@ -72,6 +101,7 @@ function main() {
 
   initSunUI(sunBehavior);
   initWaterUI(scene.getObject('water'));
+  initMapFileInput((image) => terrain.updateHeightMap(image.src));
 }
 
 main();

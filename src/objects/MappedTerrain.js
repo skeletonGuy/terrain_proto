@@ -2,23 +2,37 @@ import * as THREE from 'three';
 import Object from './Object';
 
 class MappedTerrain extends Object {
-  constructor({ name, heightMapPath, width, depth, segments = 65 } = {}) {
+  constructor({
+    name,
+    heightMapPath,
+    width,
+    depth,
+    segments = 65,
+    clippingPlane,
+  } = {}) {
     super(name);
     const texture = new THREE.TextureLoader().load(
       '/textures/aerial_ground_rock.jpg',
     );
+    this._segments = segments;
     this._geometry = new THREE.PlaneGeometry(width, depth, segments, segments);
     this._material = new THREE.MeshStandardMaterial({
       side: THREE.DoubleSide,
       roughness: 1,
       map: texture,
+      clippingPlane: clippingPlane ?? null,
     });
     this._mesh = new THREE.Mesh(this._geometry, this._material);
     this._mesh.rotation.x = -Math.PI / 2;
+    this._heightMapPath = heightMapPath;
 
-    new THREE.TextureLoader().load(heightMapPath, (mapTexture) => {
+    this.loadHeightMap();
+  }
+
+  loadHeightMap() {
+    new THREE.TextureLoader().load(this._heightMapPath, (mapTexture) => {
       const mapData = this.getMapData(mapTexture);
-      this.updateTerrain(mapData, segments, mapTexture);
+      this.updateTerrain(mapData, this._segments, mapTexture);
     });
   }
 
@@ -49,6 +63,11 @@ class MappedTerrain extends Object {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
     return imageData.data;
+  }
+
+  updateHeightMap(mapPath) {
+    this._heightMapPath = mapPath;
+    this.loadHeightMap();
   }
 }
 

@@ -8,6 +8,7 @@ class WaterPlane extends Object {
     // TODO: scene objects should be stored in the parent GameScene object
     // Object class items should not interact with scene directly
     this._geometry = new THREE.PlaneGeometry(5000, 5000);
+    this._isReceding = false;
 
     this._mesh = new Water(this._geometry, {
       textureWidth: 2048,
@@ -28,6 +29,14 @@ class WaterPlane extends Object {
 
     this._mesh.rotation.x = -Math.PI / 2;
     this._mesh.position.y = 600;
+  }
+
+  get isReceding() {
+    return this._isReceding;
+  }
+
+  set isReceding(bool) {
+    this._isReceding = bool;
   }
 
   getMesh() {

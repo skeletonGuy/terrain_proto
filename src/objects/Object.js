@@ -5,6 +5,7 @@ class Object {
     this._geometry;
     this._material;
     this._mesh;
+    this._animationBehaviors = [];
   }
 
   addObject(object) {
@@ -28,6 +29,18 @@ class Object {
 
   get name() {
     return this._name;
+  }
+
+  get animationBehaviors() {
+    const childBehaviors = this._subObjects.map(
+      (obj) => obj.animationBehaviors,
+    );
+
+    return [...childBehaviors, ...this._animationBehaviors];
+  }
+
+  addAnimationBehavior(objectAnimationBehavior) {
+    this._animationBehaviors.push(objectAnimationBehavior.bind(this));
   }
 }
 

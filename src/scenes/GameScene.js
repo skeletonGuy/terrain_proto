@@ -17,6 +17,7 @@ class GameScene {
     this._lastRenderTime = 0;
     this._orbitControls;
     this._stats;
+    this._animationsPool = [];
 
     if (enableStats) {
       this.enableStats();
@@ -91,6 +92,15 @@ class GameScene {
     objects.forEach((obj) => this._scene.add(obj.mesh));
   }
 
+  setEnvironmentGenerator(generator) {
+    this._environmentGenerator = generator;
+  }
+
+  enableStats() {
+    this._stats = new Stats();
+    document.body.appendChild(this._stats.dom);
+  }
+
   start() {
     const animate = (time) => {
       const deltaTime = time - this._lastRenderTime;
@@ -102,6 +112,12 @@ class GameScene {
         this._activeCamera.updateProjectionMatrix();
       }
 
+      this._objects.forEach((obj) => {
+        obj.animationBehaviors.forEach((behavior) => {
+          behavior({ deltaTime, time });
+        });
+      });
+
       requestAnimationFrame(animate);
       this._renderer.render(this._scene, this._activeCamera);
 
@@ -111,15 +127,6 @@ class GameScene {
     };
 
     animate(0);
-  }
-
-  setEnvironmentGenerator(generator) {
-    this._environmentGenerator = generator;
-  }
-
-  enableStats() {
-    this._stats = new Stats();
-    document.body.appendChild(this._stats.dom);
   }
 }
 
